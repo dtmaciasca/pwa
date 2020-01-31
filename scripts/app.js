@@ -11,18 +11,24 @@
         addDialog: document.querySelector('.dialog-container')
     };
 
-    if (!window.IndexedDB) {
-        alert("¡IndexedDB no es compatible!");
-    }
-  
   var db;
-  var request = indexedDB.open("MyTestDatabase");
-  request.onerror = function(event) {
-    alert("Why didn't you allow my web app to use IndexedDB?!");
+  var request = indexedDB.open("pwametro");
+  
+  app.saveIndexDb = function (station){
+    request.onupgradeneeded = function(event) {
+    var db = event.target.result;
+
+    // Se crea un almacén para contener la información de nuestros cliente
+    // Se usará "ssn" como clave ya que es garantizado que es única
+    var objectStore = db.createObjectStore("stations", { keyPath: "ssn" });
+    objectStore.transaction.oncomplete = function(event) {
+      // Guarda los datos en el almacén recién creado.
+    var customerObjectStore = db.transaction("stations", "readwrite").objectStore("stations");
+        customerObjectStore.add(station);
+    }
   };
-  request.onsuccess = function(event) {
-    db = request.result;
   };
+  
   
     /*****************************************************************************
      *
@@ -136,6 +142,7 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
+                    app.saveIndexDb()
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
