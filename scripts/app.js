@@ -14,17 +14,24 @@
   var db;
   var request = indexedDB.open("pwametro");
   
+  const customerData = [
+  { _meta: {ssn:"444-44-4444", name: "Bill", age: 35, email: "bill@company.com" }},
+  { _meta: {ssn:"555-55-5555", name: "Donna", age: 32, email: "donna@home.org" }}
+  ];
+  
   //app.saveIndexDb = function (station){
     request.onupgradeneeded = function(event) {
     var db = event.target.result;
 
     // Se crea un almacén para contener la información de nuestros cliente
     // Se usará "ssn" como clave ya que es garantizado que es única
-    var objectStore = db.createObjectStore("stations", { keyPath: "message" });
+    var objectStore = db.createObjectStore("stations", { keyPath: "_meta" });
     objectStore.transaction.oncomplete = function(event) {
       // Guarda los datos en el almacén recién creado.
     var customerObjectStore = db.transaction("stations", "readwrite").objectStore("stations");
-        customerObjectStore.add('station');
+        for (var i in customerData) {
+          customerObjectStore.add(customerData[i]);
+        }
     }
   };
   //};
@@ -142,7 +149,6 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    alert(request.response);
                     //app.saveIndexDb(result);
                 }
             } else {
