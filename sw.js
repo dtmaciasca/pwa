@@ -11,4 +11,5 @@ if (workbox) {
     { url: "/index.html", revision:"383676"},
     { url: "/styles/inline.css", revision:null},
     { url: "/scripts/app.js", revision:null},
+    { url: "/scripts/install.js", revision:null},
   ]);
