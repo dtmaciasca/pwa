@@ -11,12 +11,17 @@
         addDialog: document.querySelector('.dialog-container')
     };
 
-    // Configuracion de localforage para el almacenamiento
-    localforage.config({
-        driver: localforage.IndexedDB,
-        name: 'MetroApp-Taller1'
-    });
-
+    if (!window.IndexedDB) {
+        alert("¡IndexedDB no es compatible!");
+    }
+    const dbconnect = window.IndexedDB.open('Mibasededatos', 1);
+    dbconnect.onupgradeneeded = ev => {
+      console.log('Actualizar BD');
+      const db = ev.target.result;
+      const store = db.createObjectStore('Usuario', { keyPath: 'id', autoIncrement: true });
+      store.createIndex('Nickname', 'Nickname', { unique: false });
+      store.createIndex('email', 'email', { unique: true });
+    }
     /*****************************************************************************
      *
      * Event listeners for UI elements
@@ -75,8 +80,6 @@
     app.updateTimetableCard = function (data) {
         var key = data.key;
         var dataLastUpdated = new Date(data.created);
-          console.log('schedules data', data);
-
         var schedules = data.schedules;
         var card = app.visibleCards[key];
 
@@ -168,7 +171,7 @@
                 message: '2 mn'
             },
             {
-                message: '5 mn'
+                message: '9 mn'
             }
         ]
 
@@ -191,36 +194,4 @@
     app.selectedTimetables = [
         {key: initialStationTimetable.key, label: initialStationTimetable.label}
     ];
-  
-    app.saveSelectedTimetables = function() {
-        var timetables = JSON.stringify(app.selectedTimetables);
-        localforage.setItem('timetables', timetables).then(function(value){
-            console.log('Se guardaron las Timetables seleccionadas');
-        });
-    };
-    
-    app.defaultTimetables = function() {
-        app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Défense');
-        app.selectedTimetables = [
-                {key: initialStationTimetable.key, label: initialStationTimetable.label}
-                ];
-        app.saveSelectedTimetables();
-    };
-    
-    localforage.getItem('timetables').then(function(value) {
-        
-        app.selectedTimetables = value;
-        
-        if (app.selectedTimetables) {
-            app.selectedTimetables = JSON.parse(app.selectedTimetables);
-            app.selectedTimetables.forEach(function(timetable) {
-                app.getSchedule( timetable.key, timetable.label);
-            });
-        } else {
-            app.defaultTimetables();
-        }
-    }).catch(function (err) {
-        console.log(err);
-        app.defaultTimetables();
-    });
 })();
