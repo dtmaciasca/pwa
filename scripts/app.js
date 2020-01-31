@@ -15,17 +15,15 @@
   var request = indexedDB.open("pwametro");
   
   const customerData = [
-  { _meta: {ssn:"444-44-4444", name: "Bill", age: 35, email: "bill@company.com" }},
-  { _meta: {ssn:"555-55-5555", name: "Donna", age: 32, email: "donna@home.org" }}
+  { ssn:"555-55-5555", name: "Donna", age: 32, email: "donna@home.org" }
   ];
   
-  //app.saveIndexDb = function (station){
-    request.onupgradeneeded = function(event) {
+  request.onupgradeneeded = function(event) {
     var db = event.target.result;
 
     // Se crea un almacén para contener la información de nuestros cliente
     // Se usará "ssn" como clave ya que es garantizado que es única
-    var objectStore = db.createObjectStore("stations", { keyPath: "_meta" });
+    var objectStore = db.createObjectStore("stations", { keyPath: "ssn" });
     objectStore.transaction.oncomplete = function(event) {
       // Guarda los datos en el almacén recién creado.
     var customerObjectStore = db.transaction("stations", "readwrite").objectStore("stations");
@@ -34,7 +32,6 @@
         }
     }
   };
-  //};
   
   
     /*****************************************************************************
@@ -149,7 +146,18 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    //app.saveIndexDb(result);
+                    var db = event.target.result;
+
+                    // Se crea un almacén para contener la información de nuestros cliente
+                    // Se usará "ssn" como clave ya que es garantizado que es única
+                    var objectStore = db.createObjectStore("stations", { keyPath: "ssn" });
+                    objectStore.transaction.oncomplete = function(event) {
+                      // Guarda los datos en el almacén recién creado.
+                    var customerObjectStore = db.transaction("stations", "readwrite").objectStore("stations");
+                        for (var i in customerData) {
+                          customerObjectStore.add(customerData[i]);
+                        }
+                    }
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
