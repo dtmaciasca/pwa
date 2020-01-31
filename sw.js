@@ -10,5 +10,5 @@ if (workbox) {
   workbox.precaching.precacheAndRoute([
     { url: "/index.html", revision:"383676"},
     { url: "/styles/inline.css", revision:null},
-    { url: "/scripts/app.js", revision:"383676"},
+    { url: "/scripts/app.js", revision:null},
   ]);

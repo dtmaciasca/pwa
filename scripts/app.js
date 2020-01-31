@@ -127,7 +127,7 @@
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
-                app.updateTimetableCard(initialStationTimetable);
+                //app.updateTimetableCard(initialStationTimetable);
             }
         };
         request.open('GET', url);
