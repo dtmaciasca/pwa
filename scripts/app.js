@@ -14,16 +14,40 @@
   /*var db;
   var objectStore;
   var request = indexedDB.open("pwametro");*/
+ function openIndexedDB () {
+  // This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
+
+  var openDB = indexedDB.open("pwametrodb", 1);
+
+  openDB.onupgradeneeded = function() {
+    var db = {}
+    db.result = openDB.result;
+    db.store = db.result.createObjectStore("stations", {keyPath: "key"});
+  };
+
+  return openDB;
+}
   
-  
-  const customerData = [
-  { ssn:"555-55-5555", name: "Donna", age: 32, email: "donna@home.org" }
-  ];
-  
-  /*request.onupgradeneeded = function(event) {
-    db = event.target.result;
-  };*/
-  
+  function getStoreIndexedDB (openDB) {
+  var db = {};
+  db.result = openDB.result;
+  db.tx = db.result.transaction("stations", "readwrite");
+  db.store = db.tx.objectStore("stations");
+
+  return db;
+}
+
+  function saveIndexedDB (key, filedata, fileindex) {
+  var openDB = openIndexedDB();
+
+  openDB.onsuccess = function() {
+    var db = getStoreIndexedDB(openDB);
+
+    db.store.put({key: key, data: filedata});
+  }
+
+  return true;
+}
   
     /*****************************************************************************
      *
@@ -137,10 +161,7 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    var objStore = db.createObjectStore("names", { keyPath: "ssn" });
-
-                    //objectStore = db.transaction.objectStore("stations");
-                    objStore.add(customerData[0]);
+                    saveIndexedDB(key, {key:key, label: label, schedules: result.schedules});
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
