@@ -14,14 +14,16 @@
     if (!window.IndexedDB) {
         alert("¡IndexedDB no es compatible!");
     }
-    const dbconnect = window.IndexedDB.open('Mibasededatos', 1);
-    dbconnect.onupgradeneeded = ev => {
-      console.log('Actualizar BD');
-      const db = ev.target.result;
-      const store = db.createObjectStore('Usuario', { keyPath: 'id', autoIncrement: true });
-      store.createIndex('Nickname', 'Nickname', { unique: false });
-      store.createIndex('email', 'email', { unique: true });
-    }
+  
+  var db;
+  var request = indexedDB.open("MyTestDatabase");
+  request.onerror = function(event) {
+    alert("Why didn't you allow my web app to use IndexedDB?!");
+  };
+  request.onsuccess = function(event) {
+    db = request.result;
+  };
+  
     /*****************************************************************************
      *
      * Event listeners for UI elements
