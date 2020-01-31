@@ -11,18 +11,18 @@
         addDialog: document.querySelector('.dialog-container')
     };
 
-  var db;
+  /*var db;
   var objectStore;
-  var request = indexedDB.open("pwametro");
+  var request = indexedDB.open("pwametro");*/
+  
   
   const customerData = [
   { ssn:"555-55-5555", name: "Donna", age: 32, email: "donna@home.org" }
   ];
   
-  request.onupgradeneeded = function(event) {
-    var db = event.target.result;
-    objectStore = db.createObjectStore("stations", { keyPath: "ssn" });
-  };
+  /*request.onupgradeneeded = function(event) {
+    db = event.target.result;
+  };*/
   
   
     /*****************************************************************************
@@ -137,8 +137,10 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    var objectStore = db.transaction.objectStore("stations");
-                    alert(objectStore)
+                    var objStore = db.createObjectStore("names", { keyPath: "ssn" });
+
+                    //objectStore = db.transaction.objectStore("stations");
+                    objStore.add(customerData[0]);
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
