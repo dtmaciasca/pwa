@@ -14,20 +14,20 @@
   var db;
   var request = indexedDB.open("pwametro");
   
-  app.saveIndexDb = function (station){
+  //app.saveIndexDb = function (station){
     request.onupgradeneeded = function(event) {
     var db = event.target.result;
 
     // Se crea un almacén para contener la información de nuestros cliente
     // Se usará "ssn" como clave ya que es garantizado que es única
-    var objectStore = db.createObjectStore("stations", { keyPath: "ssn" });
+    var objectStore = db.createObjectStore("stations", { keyPath: "message" });
     objectStore.transaction.oncomplete = function(event) {
       // Guarda los datos en el almacén recién creado.
     var customerObjectStore = db.transaction("stations", "readwrite").objectStore("stations");
-        customerObjectStore.add(station);
+        customerObjectStore.add('station');
     }
   };
-  };
+  //};
   
   
     /*****************************************************************************
@@ -142,7 +142,8 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    app.saveIndexDb()
+                    alert(request.response);
+                    //app.saveIndexDb(result);
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
