@@ -70,6 +70,8 @@
     app.updateTimetableCard = function (data) {
         var key = data.key;
         var dataLastUpdated = new Date(data.created);
+          console.log('schedules data', data);
+
         var schedules = data.schedules;
         var card = app.visibleCards[key];
 
@@ -127,7 +129,7 @@
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
-                //app.updateTimetableCard(initialStationTimetable);
+                app.updateTimetableCard(initialStationTimetable);
             }
         };
         request.open('GET', url);
