@@ -149,7 +149,7 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    saveIndexedDB(key, {key:key, label: key});
+                    saveIndexedDB(key, {key:key, label: 'Bastille, Direction La Défense'});
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
