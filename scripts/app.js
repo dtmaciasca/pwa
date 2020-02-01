@@ -177,7 +177,14 @@
     };
   
     app.inicializarSchedules = async function(){
-      var transaction = await db.result.transaction(STATIONS, "readonly"); 
+      var tx = await db.result.transaction(STATIONS, "readonly"); 
+      var objectStore = db.tx.objectStore(STATIONS).getAll();
+      objectStore.onsuccess = function(event){
+          if(event.target.result !== undefined){
+              var horario = event.target.result;
+              
+          }
+      }
     }
 
     /*
