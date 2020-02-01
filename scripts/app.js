@@ -99,6 +99,7 @@
         var card = app.visibleCards[key];
 
         if (!card) {
+           alert('key'+)
             var label = data.label.split(', ');
             var title = label[0];
             var subtitle = label[1];
@@ -149,7 +150,7 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    saveIndexedDB(key, {key:key, label: 'Bastille, Direction La Défense'});
+                    saveIndexedDB(key, {key:key, label: label});
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
@@ -223,8 +224,8 @@
      *   SimpleDB (https://gist.github.com/inexorabletash/c8069c042b734519680c)
      ************************************************************************/
 
-    app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Défense');
+    /*app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Défense');
     app.selectedTimetables = [
         {key: initialStationTimetable.key, label: initialStationTimetable.label}
-    ];
+    ];*/
 })();
