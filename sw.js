@@ -1,5 +1,4 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
-import {cacheNames} from 'workbox-core';
 
 if (workbox) {
   console.log(`Yay! Workbox is loaded 🎉`);
@@ -13,10 +12,3 @@ if (workbox) {
     { url: "/styles/inline.css", revision:null},
     { url: "/scripts/app.js", revision:null},
   ]);
-
-
-self.addEventListener('install', (event) => {
-  const urls = [/* ... */];
-  const cacheName = cacheNames.runtime;
-  event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(urls)));
-});

@@ -36,50 +36,6 @@
     db.store.put({key: key, data: filedata});
     return true;
   }
-
-  /*
-  function openIndexedDB () {
-    let openDB = indexedDB.open("pwametrodb", 1);
-    openDB.onupgradeneeded = function() {
-      var db = {}
-      db.result = openDB.result;
-      db.store = db.result.createObjectStore(STATIONS, {keyPath: "key"});
-    };
-
-    return openDB;
-  }
-  
-  function getStoreIndexedDB (openDB) {
-    var db = {};
-    db.result = openDB.result;
-    db.tx = db.result.transaction(STATIONS, "readwrite");
-    db.store = db.tx.objectStore(STATIONS);
-
-    return db;
-  }
-
-  function saveIndexedDB (key, filedata, fileindex) {
-    var openDB = openIndexedDB();
-
-    openDB.onsuccess = function() {
-      var db = getStoreIndexedDB(openDB);
-
-      db.store.put({key: key, data: filedata});
-    }
-
-    return true;
-  }
-  
-  var openDB = openIndexedDB();
-  openDB.onsuccess = function(event){
-    var db = {};
-    console.log('onsuccess:', openDB.result)
-    db.result = openDB.result;
-    
-    app.inicializarSchedules();
-    
-    app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Defense');
-  }*/
   
     /*****************************************************************************
      *
