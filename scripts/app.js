@@ -219,6 +219,7 @@
       objectStore.onsuccess = function(event){
           if(event.target.result !== undefined){
               var tablaHorarios = event.target.result;
+              console.log(typeof(tablaHorarios))
               if(tablaHorarios.length > 0){
                   tablaHorarios.forEach(function(item) {
                       app.getSchedule(item.key, item.label);
