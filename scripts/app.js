@@ -193,7 +193,8 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    alert(label);
+                    alert(result.label)
+                    if(result.indefined !== undefined)
                     saveIndexedDB(key, {key:key, label: label});
                 }
             } else {
@@ -219,13 +220,11 @@
       objectStore.onsuccess = function(event){
           if(event.target.result !== undefined){
               var tablaHorarios = event.target.result;
-              console.log(typeof(tablaHorarios))
+              console.log(tablaHorarios)
               if(tablaHorarios.length > 0){
                   tablaHorarios.forEach(function(item) {
                       app.getSchedule(item.key, item.label);
-                      app.selectedTimetables = [
-                          {key: initialStationTimetable.key, label: initialStationTimetable.label}
-                      ];
+                      app.selectedTimetables.push({key: initialStationTimetable.key, label: initialStationTimetable.label});
                   })
               }
           }
