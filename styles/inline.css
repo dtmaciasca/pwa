@@ -116,6 +116,7 @@ body {
 .header__title {
   font-weight: 400;
   font-size: 20px;
+  color: #000000;
   margin: 0;
   -webkit-box-flex: 1;
   -webkit-flex: 1;
