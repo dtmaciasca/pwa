@@ -12,9 +12,9 @@
     };
 
   const STATIONS="stations"
-  let openDB = indexedDB.open("pwametrodb", 1);
   
   function openIndexedDB () {
+    let openDB = indexedDB.open("pwametrodb", 1);
     openDB.onupgradeneeded = function() {
       var db = {}
       db.result = openDB.result;
@@ -45,8 +45,10 @@
     return true;
   }
   
+  var openDB = openIndexedDB();
   openDB.onsuccess = function(event){
     var db = {};
+    console.log('onsuccess:', )
     db.result = openDB.result;
     
     app.inicializarSchedules();
@@ -187,6 +189,9 @@
     };
   
     app.inicializarSchedules = async function(){
+      var db = {};
+      var openDB = openIndexedDB();
+      db.result = openDB.result;
       var tx = await db.result.transaction(STATIONS, "readonly"); 
       var objectStore = db.tx.objectStore(STATIONS).getAll();
       objectStore.onsuccess = function(event){
