@@ -109,7 +109,6 @@
         }
         app.getSchedule(key, label);
         app.selectedTimetables.push({key: key, label: label});
-        //saveIndexedDB(key, {key:key, label: label});
         app.toggleAddDialog(false);
     });
 
@@ -194,6 +193,7 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
+                    alert(label);
                     saveIndexedDB(key, {key:key, label: label});
                 }
             } else {
