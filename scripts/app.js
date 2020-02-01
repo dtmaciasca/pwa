@@ -137,7 +137,6 @@
     // doesn't already exist, it's cloned from the template.
 
     app.updateTimetableCard = function (data) {
-      alert('d'+data.label)
         var key = data.key;
         var dataLastUpdated = new Date(data.created);
         var schedules = data.schedules;
@@ -188,8 +187,6 @@
             if (request.readyState === XMLHttpRequest.DONE) {
                 if (request.status === 200) {
                     var response = JSON.parse(request.response);
-                    alert(response)
-
                     var result = {};
                     result.key = key;
                     result.label = label;
