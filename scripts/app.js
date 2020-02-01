@@ -12,8 +12,9 @@
     };
 
   const STATIONS="stations"
+  let openDB = indexedDB.open("pwametrodb", 1);
+  
   function openIndexedDB () {
-    var openDB = indexedDB.open("pwametrodb", 1);
     openDB.onupgradeneeded = function() {
       var db = {}
       db.result = openDB.result;
@@ -33,16 +34,25 @@
   }
 
   function saveIndexedDB (key, filedata, fileindex) {
-  var openDB = openIndexedDB();
+    var openDB = openIndexedDB();
 
-  openDB.onsuccess = function() {
-    var db = getStoreIndexedDB(openDB);
+    openDB.onsuccess = function() {
+      var db = getStoreIndexedDB(openDB);
 
-    db.store.put({key: key, data: filedata});
+      db.store.put({key: key, data: filedata});
+    }
+
+    return true;
   }
-
-  return true;
-}
+  
+  openDB.onsuccess = function(event){
+    var db = {};
+    db.result = openDB.result;
+    
+    app.inicializarSchedules();
+    
+    app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Defense');
+  }
   
     /*****************************************************************************
      *
@@ -181,8 +191,15 @@
       var objectStore = db.tx.objectStore(STATIONS).getAll();
       objectStore.onsuccess = function(event){
           if(event.target.result !== undefined){
-              var horario = event.target.result;
-              
+              var tablaHorarios = event.target.result;
+              if(tablaHorarios.length > 0){
+                  tablaHorarios.forEach(function(item) {
+                      app.getSchedule(item.key, item.label);
+                      app.selectedTimetables = [
+                          {key: initialStationTimetable.key, label: initialStationTimetable.label}
+                      ];
+                  })
+              }
           }
       }
     }
