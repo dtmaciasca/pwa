@@ -12,7 +12,24 @@
     };
 
   const STATIONS="stations"
+  var db = {}
+
+  let openDB = indexedDB.open("pwametrodb", 1);
+  openDB.onupgradeneeded = function() {
+      db = openDB.result;
+      if(!db.objectStoreNames.contains(STATIONS))
+          db.store = db.result.createObjectStore(STATIONS, {keyPath: "key"});
+  };
   
+  openDB.onsuccess = function() {
+    console.log('onsuccess:', openDB.result)
+    db = openDB.result;
+    
+    app.inicializarSchedules();
+    
+    app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Defense');
+  };
+  /*
   function openIndexedDB () {
     let openDB = indexedDB.open("pwametrodb", 1);
     openDB.onupgradeneeded = function() {
@@ -48,13 +65,13 @@
   var openDB = openIndexedDB();
   openDB.onsuccess = function(event){
     var db = {};
-    console.log('onsuccess:', )
+    console.log('onsuccess:', openDB.result)
     db.result = openDB.result;
     
     app.inicializarSchedules();
     
     app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Defense');
-  }
+  }*/
   
     /*****************************************************************************
      *
@@ -189,10 +206,8 @@
     };
   
     app.inicializarSchedules = async function(){
-      var db = {};
-      var openDB = openIndexedDB();
-      db.result = openDB.result;
-      var tx = await db.result.transaction(STATIONS, "readonly"); 
+      var db = openIndexedDB();
+      var tx = db.result.transaction(STATIONS, "readonly"); 
       var objectStore = db.tx.objectStore(STATIONS).getAll();
       objectStore.onsuccess = function(event){
           if(event.target.result !== undefined){
