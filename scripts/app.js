@@ -99,7 +99,6 @@
         var card = app.visibleCards[key];
 
         if (!card) {
-           alert('key'+)
             var label = data.label.split(', ');
             var title = label[0];
             var subtitle = label[1];
@@ -178,7 +177,8 @@
               console.log(tablaHorarios)
               if(tablaHorarios.length > 0){
                   tablaHorarios.forEach(function(item) {
-                      app.getSchedule(item.key, item.label);
+                      console.log('item ', item);
+                      app.getSchedule(item.key, item.data.label);
                       app.selectedTimetables.push({key: initialStationTimetable.key, label: initialStationTimetable.label});
                   })
               }
