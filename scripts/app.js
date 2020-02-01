@@ -18,7 +18,7 @@
   openDB.onupgradeneeded = function() {
       db = openDB.result;
       if(!db.objectStoreNames.contains(STATIONS))
-          db.store = db.result.createObjectStore(STATIONS, {keyPath: "key"});
+          db.store = db.createObjectStore(STATIONS, {keyPath: "key"});
   };
   
   openDB.onsuccess = function() {
@@ -29,6 +29,14 @@
     
     app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Defense');
   };
+  
+  function saveIndexedDB (key, filedata, fileindex) {
+    var tx = db.transaction(STATIONS, "readwrite");
+    db.store = tx.objectStore(STATIONS);
+    db.store.put({key: key, data: filedata});
+    return true;
+  }
+
   /*
   function openIndexedDB () {
     let openDB = indexedDB.open("pwametrodb", 1);
@@ -206,9 +214,8 @@
     };
   
     app.inicializarSchedules = async function(){
-      var db = openIndexedDB();
-      var tx = db.result.transaction(STATIONS, "readonly"); 
-      var objectStore = db.tx.objectStore(STATIONS).getAll();
+      var tx = db.transaction(STATIONS, "readonly"); 
+      var objectStore = tx.objectStore(STATIONS).getAll();
       objectStore.onsuccess = function(event){
           if(event.target.result !== undefined){
               var tablaHorarios = event.target.result;
