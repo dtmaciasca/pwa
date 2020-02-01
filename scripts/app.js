@@ -11,13 +11,13 @@
         addDialog: document.querySelector('.dialog-container')
     };
 
-
+  const STATIONS="stations"
   function openIndexedDB () {
     var openDB = indexedDB.open("pwametrodb", 1);
     openDB.onupgradeneeded = function() {
       var db = {}
       db.result = openDB.result;
-      db.store = db.result.createObjectStore("stations", {keyPath: "key"});
+      db.store = db.result.createObjectStore(STATIONS, {keyPath: "key"});
     };
 
     return openDB;
@@ -26,8 +26,8 @@
   function getStoreIndexedDB (openDB) {
     var db = {};
     db.result = openDB.result;
-    db.tx = db.result.transaction("stations", "readwrite");
-    db.store = db.tx.objectStore("stations");
+    db.tx = db.result.transaction(STATIONS, "readwrite");
+    db.store = db.tx.objectStore(STATIONS);
 
     return db;
   }
@@ -175,6 +175,10 @@
             app.getSchedule(key);
         });
     };
+  
+    app.inicializarSchedules = async function(){
+      var transaction = await db.result.transaction(STATIONS, "readonly"); 
+    }
 
     /*
      * Fake timetable data that is presented when the user first uses the app,
