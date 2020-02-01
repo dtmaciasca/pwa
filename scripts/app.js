@@ -109,7 +109,6 @@
         }
         app.getSchedule(key, label);
         app.selectedTimetables.push({key: key, label: label});
-        saveIndexedDB(key, {key:key, label: label});
         app.toggleAddDialog(false);
     });
 
@@ -138,13 +137,13 @@
     // doesn't already exist, it's cloned from the template.
 
     app.updateTimetableCard = function (data) {
+      alert('d'+data.label)
         var key = data.key;
         var dataLastUpdated = new Date(data.created);
         var schedules = data.schedules;
         var card = app.visibleCards[key];
 
         if (!card) {
-            alert(data.key+ '-label:'+ data.label)
             var label = data.label.split(', ');
             var title = label[0];
             var subtitle = label[1];
@@ -189,13 +188,15 @@
             if (request.readyState === XMLHttpRequest.DONE) {
                 if (request.status === 200) {
                     var response = JSON.parse(request.response);
+                    alert(response)
+
                     var result = {};
                     result.key = key;
                     result.label = label;
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    saveIndexedDB(key, {key:key, label: label});
+                    saveIndexedDB(key, {key:key, label: key});
                 }
             } else {
                 // Return the initial weather forecast since no data is available.
