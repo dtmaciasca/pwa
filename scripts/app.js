@@ -109,6 +109,7 @@
         }
         app.getSchedule(key, label);
         app.selectedTimetables.push({key: key, label: label});
+        saveIndexedDB(key, {key:key, label: label});
         app.toggleAddDialog(false);
     });
 
@@ -143,6 +144,7 @@
         var card = app.visibleCards[key];
 
         if (!card) {
+            alert(data.key+ '-label:'+ data.label)
             var label = data.label.split(', ');
             var title = label[0];
             var subtitle = label[1];
@@ -193,8 +195,6 @@
                     result.created = response._metadata.date;
                     result.schedules = response.result.schedules;
                     app.updateTimetableCard(result);
-                    alert(result.label)
-                    if(result.indefined !== undefined)
                     saveIndexedDB(key, {key:key, label: label});
                 }
             } else {
