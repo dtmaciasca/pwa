@@ -1,230 +1,221 @@
-(function () {
-    'use strict';
+(function() {
+  "use strict";
 
-    var app = {
-        isLoading: true,
-        visibleCards: {},
-        selectedTimetables: [],
-        spinner: document.querySelector('.loader'),
-        cardTemplate: document.querySelector('.cardTemplate'),
-        container: document.querySelector('.main'),
-        addDialog: document.querySelector('.dialog-container')
-    };
+  var app = {
+    isLoading: true,
+    visibleCards: {},
+    selectedTimetables: [],
+    spinner: document.querySelector(".loader"),
+    cardTemplate: document.querySelector(".cardTemplate"),
+    container: document.querySelector(".main"),
+    addDialog: document.querySelector(".dialog-container")
+  };
 
-  const STATIONS="stations"
-  var db = {}
+  const STATIONS = "stations";
+  var db = {};
 
   let openDB = indexedDB.open("pwametrodb", 1);
   openDB.onupgradeneeded = function() {
-      db = openDB.result;
-      if(!db.objectStoreNames.contains(STATIONS))
-          db.store = db.createObjectStore(STATIONS, {keyPath: "key"});
+    db = openDB.result;
+    if (!db.objectStoreNames.contains(STATIONS))
+      db.store = db.createObjectStore(STATIONS, { keyPath: "key" });
   };
-  
+
   openDB.onsuccess = function() {
     db = openDB.result;
-    
+
     app.inicializarSchedules();
-    
-    app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Defense');
+
+    app.getSchedule("metros/1/bastille/A", "Bastille, Direction La Defense");
   };
-  
-  function saveIndexedDB (key, filedata, fileindex) {
+
+  function saveIndexedDB(key, filedata, fileindex) {
     var tx = db.transaction(STATIONS, "readwrite");
     db.store = tx.objectStore(STATIONS);
-    db.store.put({key: key, data: filedata});
+    db.store.put({ key: key, data: filedata });
     return true;
   }
-  
-    /*****************************************************************************
-     *
-     * Event listeners for UI elements
-     *
-     ****************************************************************************/
 
-    document.getElementById('butRefresh').addEventListener('click', function () {
-        // Refresh all of the metro stations
-        app.updateSchedules();
-    });
+  /*****************************************************************************
+   *
+   * Event listeners for UI elements
+   *
+   ****************************************************************************/
 
-    document.getElementById('butAdd').addEventListener('click', function () {
-        // Open/show the add new station dialog
-        app.toggleAddDialog(true);
-    });
+  document.getElementById("butRefresh").addEventListener("click", function() {
+    // Refresh all of the metro stations
+    app.updateSchedules();
+  });
 
-    document.getElementById('butAddCity').addEventListener('click', function () {
+  document.getElementById("butAdd").addEventListener("click", function() {
+    // Open/show the add new station dialog
+    app.toggleAddDialog(true);
+  });
 
+  document.getElementById("butAddCity").addEventListener("click", function() {
+    var select = document.getElementById("selectTimetableToAdd");
+    var selected = select.options[select.selectedIndex];
+    var key = selected.value;
+    var label = selected.textContent;
+    if (!app.selectedTimetables) {
+      app.selectedTimetables = [];
+    }
+    app.getSchedule(key, label);
+    app.selectedTimetables.push({ key: key, label: label });
+    app.toggleAddDialog(false);
+  });
 
-        var select = document.getElementById('selectTimetableToAdd');
-        var selected = select.options[select.selectedIndex];
-        var key = selected.value;
-        var label = selected.textContent;
-        if (!app.selectedTimetables) {
-            app.selectedTimetables = [];
-        }
-        app.getSchedule(key, label);
-        app.selectedTimetables.push({key: key, label: label});
-        app.toggleAddDialog(false);
-    });
+  document.getElementById("butAddCancel").addEventListener("click", function() {
+    // Close the add new station dialog
+    app.toggleAddDialog(false);
+  });
 
-    document.getElementById('butAddCancel').addEventListener('click', function () {
-        // Close the add new station dialog
-        app.toggleAddDialog(false);
-    });
+  /*****************************************************************************
+   *
+   * Methods to update/refresh the UI
+   *
+   ****************************************************************************/
 
+  // Toggles the visibility of the add new station dialog.
+  app.toggleAddDialog = function(visible) {
+    if (visible) {
+      app.addDialog.classList.add("dialog-container--visible");
+    } else {
+      app.addDialog.classList.remove("dialog-container--visible");
+    }
+  };
 
-    /*****************************************************************************
-     *
-     * Methods to update/refresh the UI
-     *
-     ****************************************************************************/
+  // Updates a timestation card with the latest weather forecast. If the card
+  // doesn't already exist, it's cloned from the template.
 
-    // Toggles the visibility of the add new station dialog.
-    app.toggleAddDialog = function (visible) {
-        if (visible) {
-            app.addDialog.classList.add('dialog-container--visible');
-        } else {
-            app.addDialog.classList.remove('dialog-container--visible');
-        }
-    };
+  app.updateTimetableCard = function(data) {
+    var key = data.key;
+    var dataLastUpdated = new Date(data.created);
+    var schedules = data.schedules;
+    var card = app.visibleCards[key];
 
-    // Updates a timestation card with the latest weather forecast. If the card
-    // doesn't already exist, it's cloned from the template.
+    if (!card) {
+      var label = data.label.split(", ");
+      var title = label[0];
+      var subtitle = label[1];
+      card = app.cardTemplate.cloneNode(true);
+      card.classList.remove("cardTemplate");
+      card.querySelector(".label").textContent = title;
+      card.querySelector(".subtitle").textContent = subtitle;
+      card.removeAttribute("hidden");
+      app.container.appendChild(card);
+      app.visibleCards[key] = card;
+    }
+    card.querySelector(".card-last-updated").textContent = data.created;
 
-    app.updateTimetableCard = function (data) {
-        var key = data.key;
-        var dataLastUpdated = new Date(data.created);
-        var schedules = data.schedules;
-        var card = app.visibleCards[key];
-
-        if (!card) {
-            var label = data.label.split(', ');
-            var title = label[0];
-            var subtitle = label[1];
-            card = app.cardTemplate.cloneNode(true);
-            card.classList.remove('cardTemplate');
-            card.querySelector('.label').textContent = title;
-            card.querySelector('.subtitle').textContent = subtitle;
-            card.removeAttribute('hidden');
-            app.container.appendChild(card);
-            app.visibleCards[key] = card;
-        }
-        card.querySelector('.card-last-updated').textContent = data.created;
-
-        var scheduleUIs = card.querySelectorAll('.schedule');
-        for(var i = 0; i<4; i++) {
-            var schedule = schedules[i];
-            var scheduleUI = scheduleUIs[i];
-            if(schedule && scheduleUI) {
-                scheduleUI.querySelector('.message').textContent = schedule.message;
-            }
-        }
-
-        if (app.isLoading) {
-            app.spinner.setAttribute('hidden', true);
-            app.container.removeAttribute('hidden');
-            app.isLoading = false;
-        }
-    };
-
-    /*****************************************************************************
-     *
-     * Methods for dealing with the model
-     *
-     ****************************************************************************/
-
-
-    app.getSchedule = function (key, label) {
-        var url = 'https://api-ratp.pierre-grimaud.fr/v3/schedules/' + key;
-
-        var request = new XMLHttpRequest();
-        request.onreadystatechange = function () {
-            if (request.readyState === XMLHttpRequest.DONE) {
-                if (request.status === 200) {
-                    var response = JSON.parse(request.response);
-                    var result = {};
-                    result.key = key;
-                    result.label = label;
-                    result.created = response._metadata.date;
-                    result.schedules = response.result.schedules;
-                    app.updateTimetableCard(result);
-                    saveIndexedDB(key, {key:key, label: label});
-                }
-            } else {
-                // Return the initial weather forecast since no data is available.
-                app.updateTimetableCard(initialStationTimetable);
-            }
-        };
-        request.open('GET', url);
-        request.send();
-    };
-
-    // Iterate all of the cards and attempt to get the latest timetable data
-    app.updateSchedules = function () {
-        var keys = Object.keys(app.visibleCards);
-        keys.forEach(function (key) {
-            app.getSchedule(key);
-        });
-    };
-  
-    app.inicializarSchedules = async function(){
-      var tx = db.transaction(STATIONS, "readonly"); 
-      var objectStore = tx.objectStore(STATIONS).getAll();
-      objectStore.onsuccess = function(event){
-          if(event.target.result !== undefined){
-              var tablaHorarios = event.target.result;
-              console.log(tablaHorarios)
-              if(tablaHorarios.length > 0){
-                  tablaHorarios.forEach(function(item) {
-                      console.log('item ', item);
-                      app.getSchedule(item.key, item.data.label);
-                      app.selectedTimetables.push({key: initialStationTimetable.key, label: initialStationTimetable.label});
-                  })
-              }
-          }
+    var scheduleUIs = card.querySelectorAll(".schedule");
+    for (var i = 0; i < 4; i++) {
+      var schedule = schedules[i];
+      var scheduleUI = scheduleUIs[i];
+      if (schedule && scheduleUI) {
+        scheduleUI.querySelector(".message").textContent = schedule.message;
       }
     }
 
-    /*
-     * Fake timetable data that is presented when the user first uses the app,
-     * or when the user has not saved any stations. See startup code for more
-     * discussion.
-     */
+    if (app.isLoading) {
+      app.spinner.setAttribute("hidden", true);
+      app.container.removeAttribute("hidden");
+      app.isLoading = false;
+    }
+  };
 
-    var initialStationTimetable = {
+  /*****************************************************************************
+   *
+   * Methods for dealing with the model
+   *
+   ****************************************************************************/
 
-        key: 'metros/1/bastille/A',
-        label: 'Bastille, Direction La Défense',
-        created: '2017-07-18T17:08:42+02:00',
-        schedules: [
-            {
-                message: '0 mn'
-            },
-            {
-                message: '2 mn'
-            },
-            {
-                message: '9 mn'
-            }
-        ]
+  app.getSchedule = function(key, label) {
+    var url = "https://api-ratp.pierre-grimaud.fr/v3/schedules/" + key;
 
-
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+      if (request.readyState === XMLHttpRequest.DONE) {
+        if (request.status === 200) {
+          var response = JSON.parse(request.response);
+          var result = {};
+          result.key = key;
+          result.label = label;
+          result.created = response._metadata.date;
+          result.schedules = response.result.schedules;
+          app.updateTimetableCard(result);
+          saveIndexedDB(key, { key: key, label: label });
+        }
+      } else {
+        // Return the initial weather forecast since no data is available.
+        app.updateTimetableCard(initialStationTimetable);
+      }
     };
+    request.open("GET", url);
+    request.send();
+  };
 
+  // Iterate all of the cards and attempt to get the latest timetable data
+  app.updateSchedules = function() {
+    var keys = Object.keys(app.visibleCards);
+    keys.forEach(function(key) {
+      app.getSchedule(key);
+    });
+  };
 
-    /************************************************************************
-     *
-     * Code required to start the app
-     *
-     * NOTE: To simplify this codelab, we've used localStorage.
-     *   localStorage is a synchronous API and has serious performance
-     *   implications. It should not be used in production applications!
-     *   Instead, check out IDB (https://www.npmjs.com/package/idb) or
-     *   SimpleDB (https://gist.github.com/inexorabletash/c8069c042b734519680c)
-     ************************************************************************/
+  app.inicializarSchedules = async function() {
+    var tx = db.transaction(STATIONS, "readonly");
+    var objectStore = tx.objectStore(STATIONS).getAll();
+    objectStore.onsuccess = function(event) {
+      var tablaHorarios = event.target.result;
+      if (tablaHorarios.length > 0 && tablaHorarios !== undefined) {
+        tablaHorarios.forEach(function(item) {
+          app.getSchedule(item.key, item.data.label);
+          app.selectedTimetables.push({
+            key: initialStationTimetable.key,
+            label: initialStationTimetable.label
+          });
+        });
+      }
+    };
+  };
 
-    /*app.getSchedule('metros/1/bastille/A', 'Bastille, Direction La Défense');
-    app.selectedTimetables = [
-        {key: initialStationTimetable.key, label: initialStationTimetable.label}
-    ];*/
+  /*
+   * Fake timetable data that is presented when the user first uses the app,
+   * or when the user has not saved any stations. See startup code for more
+   * discussion.
+   */
+
+  var initialStationTimetable = {
+    key: "metros/1/bastille/A",
+    label: "Bastille, Direction La Défense",
+    created: "2017-07-18T17:08:42+02:00",
+    schedules: [
+      {
+        message: "0 mn"
+      },
+      {
+        message: "2 mn"
+      },
+      {
+        message: "9 mn"
+      }
+    ]
+  };
+
+  /************************************************************************
+   *
+   * Code required to start the app
+   *
+   * NOTE: To simplify this codelab, we've used localStorage.
+   *   localStorage is a synchronous API and has serious performance
+   *   implications. It should not be used in production applications!
+   *   Instead, check out IDB (https://www.npmjs.com/package/idb) or
+   *   SimpleDB (https://gist.github.com/inexorabletash/c8069c042b734519680c)
+   ************************************************************************/
+
+  app.getSchedule("metros/1/bastille/A", "Bastille, Direction La Défense");
+  app.selectedTimetables = [
+    { key: initialStationTimetable.key, label: initialStationTimetable.label }
+  ];
 })();
