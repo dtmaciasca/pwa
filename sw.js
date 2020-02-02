@@ -22,8 +22,8 @@ if (workbox) {
   ]);
 
 workbox.routing.registerRoute(
-    new RegExp(/.*(?:api-ratp.pierre-grimaud)?.fr/,),
+    new RegExp(/.*(?:api-ratp.pierre-grimaud)\.fr/,),
     new workbox.strategies.StaleWhileRevalidate({
-      cachename: "dynamicCache",
+      cachename: "apiCache",
     })
 );

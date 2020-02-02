@@ -22,7 +22,6 @@
   };
   
   openDB.onsuccess = function() {
-    console.log('onsuccess:', openDB.result)
     db = openDB.result;
     
     app.inicializarSchedules();
