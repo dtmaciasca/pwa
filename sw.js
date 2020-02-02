@@ -20,3 +20,10 @@ if (workbox) {
     { url: "/images/ic_add_white_24px.svg", revision:null},
     { url: "/images/ic_refresh_white_24px.svg", revision:null},
   ]);
+
+workbox.routing.registerRoute(
+    new RegExp(/.*(?:api-ratp.pierre-grimaud)?.fr/,),
+    new workbox.strategies.StaleWhileRevalidate({
+      cachename: "dynamicCache",
+    })
+);
