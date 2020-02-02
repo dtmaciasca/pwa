@@ -30,6 +30,7 @@
   };
 
   function saveIndexedDB(key, filedata, fileindex) {
+    db = openDB.result;
     var tx = db.transaction(STATIONS, "readwrite");
     db.store = tx.objectStore(STATIONS);
     db.store.put({ key: key, data: filedata });
