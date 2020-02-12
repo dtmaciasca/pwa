@@ -27,6 +27,7 @@
     app.inicializarSchedules();
 
     app.getSchedule("metros/1/bastille/A", "Bastille, Direction La Defense");
+    window.apiLoadTime = performance.now();
   };
 
   function saveIndexedDB(key, filedata, fileindex) {
@@ -131,7 +132,6 @@
    * Methods for dealing with the model
    *
    ****************************************************************************/
-  var contador = 0;
   app.getSchedule = function(key, label) {
     var url = "https://api-ratp.pierre-grimaud.fr/v3/schedules/" + key;
 
@@ -140,12 +140,6 @@
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
           var response = JSON.parse(request.response);
-          if(contador = 0){
-            window.apiLoadTime = performance.now();
-            contador += 1;
-            console.log('time: ', performance.now());
-          }
-          console.log('contador: ', contador)
           var result = {};
           result.key = key;
           result.label = label;
