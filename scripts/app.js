@@ -131,7 +131,7 @@
    * Methods for dealing with the model
    *
    ****************************************************************************/
-
+  var contador = 0;
   app.getSchedule = function(key, label) {
     var url = "https://api-ratp.pierre-grimaud.fr/v3/schedules/" + key;
 
@@ -140,6 +140,12 @@
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
           var response = JSON.parse(request.response);
+          if(contador = 0){
+            window.apiLoadTime = performance.now();
+            contador += 1;
+            console.log('time: ', performance.now());
+          }
+          console.log('contador: ', contador)
           var result = {};
           result.key = key;
           result.label = label;
@@ -173,7 +179,6 @@
       if (tablaHorarios.length > 0 && tablaHorarios !== undefined) {
         tablaHorarios.forEach(function(item) {
           app.getSchedule(item.key, item.data.label);
-          window.apiLoadTime = performance.now();
           app.selectedTimetables.push({
             key: initialStationTimetable.key,
             label: initialStationTimetable.label
