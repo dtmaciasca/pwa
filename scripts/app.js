@@ -26,7 +26,7 @@
 
     app.inicializarSchedules();
 
-    app.getSchedule("metros/1/bastille/A----p", "Bastille, Direction La Defense");
+    app.getSchedule("metros/1/bastille/A", "Bastille, Direction La Defense");
   };
 
   function saveIndexedDB(key, filedata, fileindex) {
@@ -173,6 +173,7 @@
       if (tablaHorarios.length > 0 && tablaHorarios !== undefined) {
         tablaHorarios.forEach(function(item) {
           app.getSchedule(item.key, item.data.label);
+          window.apiLoadTime = performance.now();
           app.selectedTimetables.push({
             key: initialStationTimetable.key,
             label: initialStationTimetable.label
