@@ -173,7 +173,7 @@
       if (tablaHorarios.length > 0 && tablaHorarios !== undefined) {
         tablaHorarios.forEach(function(item) {
           app.getSchedule(item.key, item.data.label);
-          //window.cardApiLoadTime = performance.now();
+          window.apiLoadTime = performance.now();
           app.selectedTimetables.push({
             key: initialStationTimetable.key,
             label: initialStationTimetable.label
